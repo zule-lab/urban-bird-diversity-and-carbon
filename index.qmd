@@ -1,0 +1,150 @@
+---
+title: "Maps"
+format: 
+  dashboard:
+    embed-resources: true
+    theme: default
+    nav-buttons: 
+      - icon: file-earmark-text
+        href: https://link-to-paper
+        aria-label: Manuscript
+      - linkedin
+      - twitter
+      - github
+---
+
+```{r}
+#| include: false
+
+library(sf)
+library(leaflet)
+library(leaflet.minicharts)
+library(patchwork)
+library(ggplot2)
+library(ggspatial)
+library(ggiraph)
+library(biscale)
+library(dplyr)
+library(purrr)
+
+source("functions.R")
+cities <- readr::read_rds("data/cities.rds")
+legends <- readr::read_rds("data/legends.rds")
+
+map1 <- map(cities, \(x) {
+  mid <-  x |>
+    st_union() |>
+    st_centroid() |>
+    st_coordinates() |>
+    as.numeric()
+  
+  leaflet_biplot(x) |>
+    addEasyButton(easyButton(
+      htmltools::span(class = "star", htmltools::HTML("&starf;")),
+      onClick = leaflet::JS(paste0("function(btn, map) { 
+                          map.closePopup();
+                          map.setView({lon: ", mid[1], ", lat: ", mid[2], "}, 10);
+                          // Close labels - they stay stuck open on mobile
+                          map.eachLayer(function (layer) {
+                          if (layer instanceof L.Polygon) {
+                          layer.label.close();
+                          }
+                          });
+}")))
+    ) |> syncWith(x$pcname[1])
+})
+
+map2 <- map(cities, \(x) {
+  mid <-  x |>
+    st_union() |>
+    st_centroid() |>
+    st_coordinates() |>
+    as.numeric()
+  
+  leaflet_uniplot(x) |>
+    addEasyButton(easyButton(
+      htmltools::span(class = "star", htmltools::HTML("&starf;")),
+      onClick = leaflet::JS(paste0("function(btn, map) { 
+                          map.closePopup();
+                          map.setView({lon: ", mid[1], ", lat: ", mid[2], "}, 10);
+                          // Close labels - they stay stuck open on mobile
+                          map.eachLayer(function (layer) {
+                          if (layer instanceof L.Polygon) {
+                          layer.label.close();
+                          }
+                          });
+}")))
+    ) |> syncWith(x$pcname[1])
+})
+
+# Initialize maps (otherwise programatically created ones won't work)
+map1[[1]]
+```
+
+# Home
+
+## Row 1 
+
+::: {.card}
+
+### Multi-city analysis of synergies and trade-offs between urban bird diversity and carbon storage to inform decision-making
+
+![](https://img.shields.io/badge/status-In_review-yellow){width=100px}
+
+**Authors**: Kinnunen et al....
+
+**Abstract**: 
+
+:::
+
+## Row 2 {width=30%}
+
+:::{.card title="Principal Investigator Contact Information"}
+Riikka P Kinnunen  
+Institution: Concordia University  
+rpkinnunen@gmail.com   
+:::
+
+:::{.card title="Principal Investigator Contact Information"}
+Riikka P Kinnunen  
+Institution: Concordia University  
+rpkinnunen@gmail.com   
+:::
+
+# Test
+
+## Row
+
+```{r}
+map1[[1]]
+```
+
+```{r}
+map2[[1]]
+```
+
+
+
+```{r}
+#| results: "asis"
+
+for(i in names(cities)) {
+  cat("\n\n")
+  
+  cat("# ", i, "\n\n")
+  cat("## Row\n\n")
+  
+  cat("::: {.cell}", 
+      "::: {.cell-output-display}", 
+      "```{=html}\n\n", sep = "\n\n")
+  map1[[i]] |> htmltools::tagList() |> print()
+  cat("\n\n```", ":::", ":::", sep = "\n\n")
+  
+  cat("::: {.cell}", 
+      "::: {.cell-output-display}", 
+      "```{=html}\n\n", sep = "\n\n")
+  map2[[i]] |> htmltools::tagList() |> print()
+  cat("\n\n```", ":::", ":::", sep = "\n\n")
+}
+```
+
