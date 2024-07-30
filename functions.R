@@ -28,28 +28,38 @@ purple_pal <- c(
   "4-5" = "#026121",
   "5-5" = "#022921")
 
+
+
 leaflet_biplot <- function(d) {
   #https://rstudio.github.io/leaflet/articles/morefeatures.html
 
+  info <- readr::read_rds("data/city_info.rds") |>
+    filter(pcname == d$pcname[1])
+  
   p <- create_grid_legend(d, purple_pal)
-  colours <- unname(d$colours)
+  d$colours <- unname(d$colours)
+  
+  d <- mutate(d, across(contains("label_"), \(x) map(x, htmltools::HTML)))
 
   leaflet(data = d) |>
-    addProviderTiles(providers$CartoDB.Positron, group = "Carto Light") |>
-
-    addCircles(
-      lng = ~X, lat = ~Y, radius = 900,
-      group = "Circles", popup = ~label_bi,
-      fillColor = colours, opacity = 0, fillOpacity = 0.75,
-      color = colours, stroke = FALSE,
+    addProviderTiles(providers$Esri.WorldImagery, group = "Satelite") |>
+    addProviderTiles(providers$CartoDB.Positron, group = "Black and White") |>
+    addProviderTiles(providers$Stadia.StamenTerrain, group = "Terrain") |>
+    
+    addPolygons(
+      data = filter(d, bi_class %in% c("1-1", "1-5", "5-1", "5-5")),
+      group = "Priority spots", popup = ~label_bi,
+      fillColor = ~colours, opacity = 0, fillOpacity = 0.75,
+      stroke = FALSE,
       highlightOptions = highlightOptions(fillColor = "orange",
                                           fillOpacity = 1,
                                           bringToFront = TRUE),
       label = ~label_bi) |>
-
+    
     addPolygons(
-      group = "Tiles", popup = ~label_bi,
-      fillColor = colours, opacity = 0, fillOpacity = 0.75,
+      data = filter(d, !bi_class %in% c("1-1", "1-5", "5-1", "5-5")),
+      group = "Intermediate spots", popup = ~label_bi,
+      fillColor = ~colours, opacity = 0, fillOpacity = 0.75,
       stroke = FALSE,
       highlightOptions = highlightOptions(fillColor = "orange",
                                           fillOpacity = 1,
@@ -58,43 +68,57 @@ leaflet_biplot <- function(d) {
     addControl(
       position = "bottomright",
       html = p) |>
+    addControl(position = "bottomleft",
+               html = paste0(
+                 "<div>",
+                 "<strong>Population:</strong> ", format(info$population, big.mark = ","), "<br>",
+                 "<strong>Area (km²):</strong> ", format(info$area, big.mark = ","),  "<br>",
+                 "<span style='font-size:8pt'>Stats Canada 2021 Census for metropolitan areas</span>")) |>
     addLayersControl(
-      baseGroups = c("Tiles", "Circles"),
+      baseGroups = c("Terrain", "Satelite", "Black and White"),
+      overlayGroups = c("Intermediate spots", "Priority spots"),
       options = layersControlOptions(collapsed = FALSE))
 }
 
-leaflet_uniplot <- function(d) {
+leaflet_uniplot <- function(d, var, var_nice, labFormat = labelFormat(),
+                            pal = "plasma") {
   #https://rstudio.github.io/leaflet/articles/morefeatures.html
 
-  pal <- colorNumeric("viridis", domain = d$cnpy_mn)
+  #pal <- colorNumeric(colorspace::sequential_hcl(20, "terrain2"), domain = d[[var]])
+  pal <- colorNumeric(pal, domain = d[[var]])
+  
+  d$var <- d[[var]]
+  d[[paste0("label_", var)]] <- paste0("<strong>", d[[paste0("label_", var)]], "</strong>")
+
+  d <- d |>
+    rowwise() |>
+    mutate(label_overall = paste0(c_across(contains("label_")), collapse = "<br>")) |>
+    ungroup() |>
+    mutate(across(contains("label_"), \(x) map(x, htmltools::HTML)))
+  
 
   leaflet(data = d) |>
-    # addTiles() |>
-    addProviderTiles(providers$CartoDB.Positron, group = "Carto Light") |>
+    addProviderTiles(providers$Esri.WorldImagery, group = "Satelite") |>
+    addProviderTiles(providers$CartoDB.Positron, group = "Black and White") |>
+    addProviderTiles(providers$Stadia.StamenTerrain, group = "Terrain") |>
+    
     addPolygons(
-      group = "Tiles", popup = ~label_canopy,
-      fillColor = ~pal(cnpy_mn), opacity = 0, fillOpacity = 0.75,
+      group = var_nice, popup = ~label_overall,
+      fillColor = ~pal(var), opacity = 0, fillOpacity = 0.75,
       color = "white", stroke = FALSE,
       highlightOptions = highlightOptions(fillColor = "orange",
                                           fillOpacity = 1,
                                           bringToFront = TRUE),
-      label = ~label_canopy) |>
-    addCircles(
-      lng = ~X, lat = ~Y, radius = 900,
-      group = "Circles", popup = ~label_canopy,
-      fillColor = ~pal(cnpy_mn), opacity = 0, fillOpacity = 0.75,
-      color = ~pal(cnpy_mn), stroke = FALSE,
-      highlightOptions = highlightOptions(fillColor = "orange",
-                                          fillOpacity = 1,
-                                          bringToFront = TRUE),
-      label = ~label_canopy) |>
-    addLegend("bottomright", pal = pal, values = ~cnpy_mn,
-              title = "Canopy", opacity = 1) |>
+      label = ~label_overall) |>
+    addLegend("bottomright", pal = pal, values = ~var, bins = 5,
+              title = paste0("<div class='leg-title'>", var_nice, "</div>"), 
+              opacity = 1, group = var_nice,
+              labFormat = labFormat) |>
     addLayersControl(
-      baseGroups = c("Tiles", "Circles"),
+      baseGroups = c("Terrain", "Satelite", "Black and White"),
       options = layersControlOptions(collapsed = FALSE))
 }
-
+                   
 create_grid_legend <- function(data, palette, dim = 5, digits = 2) {
   # Prepare colour tiles
   cells <- create_tile_div(palette)

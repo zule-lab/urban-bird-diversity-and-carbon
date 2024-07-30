@@ -1,17 +1,20 @@
 ---
-title: "Maps"
+title: "Interactive Results"
 format: 
   dashboard:
     embed-resources: true
-    theme: default
+    theme: 
+      - Spacelab
+      - custom.scss
     nav-buttons: 
       - icon: file-earmark-text
-        href: https://link-to-paper
+        href:  https://www.biorxiv.org/content/10.1101/2024.06.21.600078v1
         aria-label: Manuscript
       - linkedin
       - twitter
       - github
 ---
+
 
 ```{r}
 #| include: false
@@ -19,62 +22,48 @@ format:
 library(sf)
 library(leaflet)
 library(leaflet.minicharts)
-library(patchwork)
-library(ggplot2)
-library(ggspatial)
-library(ggiraph)
 library(biscale)
 library(dplyr)
 library(purrr)
 
+source("prep.R")
 source("functions.R")
 cities <- readr::read_rds("data/cities.rds")
-legends <- readr::read_rds("data/legends.rds")
 
 map1 <- map(cities, \(x) {
-  mid <-  x |>
-    st_union() |>
-    st_centroid() |>
-    st_coordinates() |>
-    as.numeric()
-  
   leaflet_biplot(x) |>
-    addEasyButton(easyButton(
-      htmltools::span(class = "star", htmltools::HTML("&starf;")),
-      onClick = leaflet::JS(paste0("function(btn, map) { 
-                          map.closePopup();
-                          map.setView({lon: ", mid[1], ", lat: ", mid[2], "}, 10);
-                          // Close labels - they stay stuck open on mobile
-                          map.eachLayer(function (layer) {
-                          if (layer instanceof L.Polygon) {
-                          layer.label.close();
-                          }
-                          });
-}")))
-    ) |> syncWith(x$pcname[1])
+    leaflet.extras::addResetMapButton() |>
+    syncWith(x$pcname[1])
 })
 
-map2 <- map(cities, \(x) {
-  mid <-  x |>
-    st_union() |>
-    st_centroid() |>
-    st_coordinates() |>
-    as.numeric()
-  
-  leaflet_uniplot(x) |>
-    addEasyButton(easyButton(
-      htmltools::span(class = "star", htmltools::HTML("&starf;")),
-      onClick = leaflet::JS(paste0("function(btn, map) { 
-                          map.closePopup();
-                          map.setView({lon: ", mid[1], ", lat: ", mid[2], "}, 10);
-                          // Close labels - they stay stuck open on mobile
-                          map.eachLayer(function (layer) {
-                          if (layer instanceof L.Polygon) {
-                          layer.label.close();
-                          }
-                          });
-}")))
-    ) |> syncWith(x$pcname[1])
+map2_cover <- map(cities, \(x) {
+  leaflet_uniplot(x, "cnpy_mn", "Canopy<br>Cover", labelFormat(suffix = "%")) |>
+    leaflet.extras::addResetMapButton() |>
+    syncWith(x$pcname[1])
+})
+
+map2_height <- map(cities, \(x) {
+  leaflet_uniplot(x, "hght_mn", "Stand<br>Height") |>
+    leaflet.extras::addResetMapButton() |>
+    syncWith(x$pcname[1])
+})
+
+map2_age <- map(cities, \(x) {
+  leaflet_uniplot(x, "age_mn", "Stand<br>Age") |>
+    leaflet.extras::addResetMapButton() |>
+    syncWith(x$pcname[1])
+})
+
+map2_needle <- map(cities, \(x) {
+  leaflet_uniplot(x, "nlsp_mn", "Needle-leaved<br>Trees", labelFormat(suffix = "%")) |>
+    leaflet.extras::addResetMapButton() |>
+    syncWith(x$pcname[1])
+})
+
+map2_broad <- map(cities, \(x) {
+  leaflet_uniplot(x, "blsp_mn", "Broad-leaved<br>Trees", labelFormat(suffix = "%")) |>
+    leaflet.extras::addResetMapButton() |>
+    syncWith(x$pcname[1])
 })
 
 # Initialize maps (otherwise programatically created ones won't work)
@@ -83,45 +72,54 @@ map1[[1]]
 
 # Home
 
-## Row 1 
+## Row 1 {height="40%"}
 
-::: {.card}
+:::{.card}
 
 ### Multi-city analysis of synergies and trade-offs between urban bird diversity and carbon storage to inform decision-making
 
-![](https://img.shields.io/badge/status-In_review-yellow){width=100px}
+![](https://img.shields.io/badge/status-In_review-yellow?logoSize=auto)
+[![](https://img.shields.io/badge/bioRxiv-green?logoSize=auto)](https://www.biorxiv.org/content/10.1101/2024.06.21.600078v1)
 
-**Authors**: Kinnunen et al....
+**Authors**: [Riikka P. Kinnunen](mailto:rpkinnunen@gmail.com), Carly D. Ziter, Barbara Frei  
+
 
 **Abstract**: 
-
+Cities are particularly vulnerable to the impacts of biodiversity loss and climate change. Urban greenspaces are important ecosystems that can conserve biodiversity and help offset the carbon footprint of urban areas. However, despite large-scale tree planting and restoration initiatives in cities, it is not well known where trees or vegetation should be planted or restored to achieve multiple benefits. We considered urban greenspaces as nature-based solutions for urban climate mitigation and biodiversity conservation planning. Using bivariate mapping, we examined the spatial synergies and trade-offs between bird functional diversity and carbon storage in ten Canadian cities spanning a gradient of geography and population, and modelled the relationships between vegetation attributes and both bird diversity and amount of carbon. We found carbon and biodiversity are weakly positively correlated across the ten cities, however, this relationship varied in strength, direction and significance. Our maps highlight areas within our target cities where greenspaces could be managed, restored, or protected to maximize carbon storage and conserve biodiversity. Nationwide, our results also show that forest management strategies that promote increases in canopy cover and the proportion of needle-leaved species in urban greenspaces are potential win-win strategies for biodiversity and carbon. Our study shows NbS strategies are not always generalizable across regions. National policies should guide municipalities and cities using regional priorities and science advice, since a NbS promoting biodiversity in one region may, in fact, reduce it in another.
 :::
 
-## Row 2 {width=30%}
 
-:::{.card title="Principal Investigator Contact Information"}
-Riikka P Kinnunen  
-Institution: Concordia University  
-rpkinnunen@gmail.com   
+## Row {width="100%"}
+
+### Column {width="30%"}
+:::{.card title="Exploring these results"}
+
+These interactive results are a companion to the above study. 
+Maps on these pages show the results of bivariate analysis along with other features of urban greenspaces
+across various Canadian cities.
+
+**Tabs:** Tabs at across top of this page indicate which cities you can explore. 
+
+**Maps:** Each tab shows a map with the bivariate analysis on the left and a series of urban greenspace features mapped
+on the right. You can **hover** over tiles for more information and **pan** and **zoom** to 
+more closely explore particular areas.
+
+**Details:** For a detailed overview of the data and how to use bivariate maps, see the [Details](#details) tab.
 :::
 
-:::{.card title="Principal Investigator Contact Information"}
-Riikka P Kinnunen  
-Institution: Concordia University  
-rpkinnunen@gmail.com   
-:::
-
-# Test
-
-## Row
-
+### Column {width="40%"}
+:::{.card title="Bivarate Example"}
 ```{r}
-map1[[1]]
+map1[["Montréal"]]
 ```
+:::
 
+### Column {width="40%"}
+:::{.card title="Canopy cover Example"}
 ```{r}
-map2[[1]]
+map2_cover[["Montréal"]]
 ```
+:::
 
 
 
@@ -133,18 +131,116 @@ for(i in names(cities)) {
   
   cat("# ", i, "\n\n")
   cat("## Row\n\n")
+  cat("### Column\n\n")
   
-  cat("::: {.cell}", 
+  cat("::: {.cell title='Carbon x Richness'}", 
       "::: {.cell-output-display}", 
       "```{=html}\n\n", sep = "\n\n")
   map1[[i]] |> htmltools::tagList() |> print()
   cat("\n\n```", ":::", ":::", sep = "\n\n")
   
-  cat("::: {.cell}", 
+  cat("### Column {.tabset}\n\n")
+  
+  cat("::: {.cell title='Canopy Cover'}", 
       "::: {.cell-output-display}", 
       "```{=html}\n\n", sep = "\n\n")
-  map2[[i]] |> htmltools::tagList() |> print()
+  map2_cover[[i]] |> htmltools::tagList() |> print()
+  cat("\n\n```", ":::", ":::", sep = "\n\n")
+  
+  cat("::: {.cell title='Stand Height'}", 
+      "::: {.cell-output-display}", 
+      "```{=html}\n\n", sep = "\n\n")
+  map2_height[[i]] |> htmltools::tagList() |> print()
+  cat("\n\n```", ":::", ":::", sep = "\n\n")
+  
+  cat("::: {.cell title='Stand Age'}", 
+      "::: {.cell-output-display}", 
+      "```{=html}\n\n", sep = "\n\n")
+  map2_age[[i]] |> htmltools::tagList() |> print()
+  cat("\n\n```", ":::", ":::", sep = "\n\n")
+  
+  cat("::: {.cell title='Needle-leaved Trees'}", 
+      "::: {.cell-output-display}", 
+      "```{=html}\n\n", sep = "\n\n")
+  map2_needle[[i]] |> htmltools::tagList() |> print()
+  cat("\n\n```", ":::", ":::", sep = "\n\n")
+  
+  cat("::: {.cell title='Broad-leaved Trees'}", 
+      "::: {.cell-output-display}", 
+      "```{=html}\n\n", sep = "\n\n")
+  map2_broad[[i]] |> htmltools::tagList() |> print()
   cat("\n\n```", ":::", ":::", sep = "\n\n")
 }
 ```
+
+
+# **Details** {orientation="columns"}
+
+## Column 1
+
+:::{.card title="Understanding bivariate legends"}
+
+A bivariate map uses two colours combined to show how two different variables 
+interact on the landscape.
+
+Here we explore carbon storage and bird functional species richness in urban greenspaces.
+
+Each variable is binned into 5 different categories (1, 2, 3, 4, and 5). Then each site is 
+assigned a combined score, for example, a site with a 1-1 score indicates that it 
+has low carbon storage as well as low species richness.
+
+This in turn results in identifying hotspots, cold spots, and areas high in one of
+the two variables.
+
+- **Hotspots** - Areas important for conservation
+- **Cold spots** - Areas important for restoration
+- **Trade-off Areas** - Areas which need more research and are important for management to keep biodiversity or carbon storage high
+
+:::{style="width:70%; margin: 0 auto;"}
+![](bivariate_recommendations_grid.png){fig-alt="A bivarate colour legend, showing a grid of 25 colours ranging from white to dark purple on the x-axis and from white to bright green on the y-axis. Values are a mix of green and purple becoming progressivly more saturated as they go up and right. The x-axis is labelled functional richness, the y-axis is labelled carbon. The upper right tile is labelled 'Hotspot-Conservation', the bottom left tile is labelled 'Coldspot - Restoration', the two other corner tiles are labelled 'Research + Management'."}
+:::
+
+:::
+
+## Column 2
+
+:::{.card title="Measurements"}
+
+- **Carbon**: Total Carbon. Total above-ground forest carbon (kg C/m²) in each grid. Modified from a recently published high-resolution map of Canada's terrestrial carbon stocks (Sothe et al., 2022). 
+- **Richness**: Bird functional richness. Calculated using R package FD. 
+- **Canopy Cover**: Mean canopy cover. Mean of the percent crown closure values in each grid.
+- **Stand Age**: Mean tree stand age. Mean tree stand age (mean age of the leading species of polygons in years) in each grid.
+- **Stand Height**: Mean tree stand height. Mean tree stand height (mean height of the leading species of polygons in meters) in each grid.
+- **Needle-leaved Trees**: Mean percentage of needle-leaved tree species. Mean percent composition of all needle-leaved species. 
+- **Broad-leaved Trees**: Mean percentage of broad-leaved tree species. Mean percent composition of all broad-leaved species. 
+
+:::
+
+:::{.card title="Data Citations"}
+
+Modified data used for data analyses. Data was compiled from multiple sources:
+
+eBird data: eBird Basic Dataset. (2022). <https://ebird.org>
+
+Carbon data: Sothe, C., Gonsamu, A., Snider, J., Arabian, J., Kurz, W. A., & Finkelstein, S. (2021). Carbon map and uncertainty in forested areas of Canada, 250m spatial resolution (Version 1) [Data set]. 4TU.ResearchData. <https://doi.org/10.4121/14572929.V1>
+
+Vegetation attributes data: Beaudoin, A., Bernier, P. Y., Villemaire, P., Guindon, L., & Guo, X. J. (2018). Tracking forest attributes across Canada between 2001 and 2011 using a k nearest neighbors mapping approach applied to MODIS imagery. Canadian Journal of Forest Research, 48(1), 85-93. <https://open.canada.ca/data/en/dataset/ec9e2659-1c29-4ddb-87a2-6aced147a990>
+
+Bird life-history data for functional diversity analyses:
+Myhrvold, P. N., Baldridge, E., Chan, B., Sivam, D., L. Freeman, D., & Ernest, S. K. M. (2016). An amniote life-history database to perform comparative analyses with birds, mammals, and reptiles (Version 1). Wiley. <https://doi.org/10.6084/m9.figshare.c.3308127.v1> 
+
+Tobias, J. A., Sheard, C., Pigot, A. L., Devenish, A. J., Yang, J., Sayol, F., ... & Schleuning, M. (2022). AVONET: morphological, ecological and geographical data for all birds. Ecology Letters, 25(3), 581-597.
+The AVONET dataset and all code for figures and analyses in this manuscript are archived on Figshare <https://figshare.com/s/b990722d72a26b5bfead>
+
+Urban area boundary:
+Statistics Canada. Population Centre boundary files. <https://www12.statcan.gc.ca/census-recensement/2021/geo/sip-pis/boundary-limites/index2021-eng.cfm?year=21>
+
+:::
+
+
+
+
+
+
+
 
