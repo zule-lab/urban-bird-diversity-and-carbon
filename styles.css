@@ -1,0 +1,61 @@
+
+.leg-grid-item {
+  display: flex;
+  align-items: center;  /* Vertical alignment */
+  font-size: 11pt;
+  padding: 2px;
+
+}
+
+.leg-cell {
+  width: 20pt;
+  height: 20pt;
+}
+
+.leg-side-number {
+  width: 20pt;
+  justify-content: end;
+  font-size: 10pt;
+}
+
+.leg-bottom-number {
+  height: 20pt;
+  justify-content: center;
+  font-size: 10pt;
+}
+
+
+.leg-side-label {
+  justify-content: center;
+
+ writing-mode: vertical-lr;
+  /* https://css-tricks.com/snippets/css/text-rotation/ */
+  transform: rotate(180deg);
+  /* Legacy vendor prefixes*/
+  -webkit-transform: rotate(180deg); /* Safari */
+  -moz-transform: rotate(180deg); /* Firefox */
+  -ms-transform: rotate(180deg);  /* IE */
+  -o-transform: rotate(180deg); /* Opera */
+  filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=2); /* Internet Explorer */
+}
+
+.leg-bottom-label {
+}
+
+.leg-empty {
+}
+
+.leg-tooltip {
+  visibility: hidden;
+}
+.leg-cell:hover .leg-tooltip{ 
+  visibility: visible;
+}
+
+.leg-tooltip-left {
+ right: 15px; 
+}
+
+.leg-title {
+  text-align: center;
+}

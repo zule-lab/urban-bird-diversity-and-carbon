@@ -121,68 +121,100 @@ leaflet_uniplot <- function(d, var, var_nice, labFormat = labelFormat(),
                    
 create_grid_legend <- function(data, palette, dim = 5, digits = 2) {
   # Prepare colour tiles
-  cells <- create_tile_div(palette)
-  grid <- matrix(cells, byrow = TRUE, nrow = dim)
-  grid <- grid[dim:1, , drop = FALSE] # Transform to correct orientation
+
+  grid <- matrix(palette, byrow = TRUE, nrow = dim)
   grid <- t(grid)
-  #grid <- grid[, dim:1 , drop = FALSE] # Transform to correct orientation
+  grid <- grid[, dim:1, drop = FALSE] # Transform to correct orientation
+  grid <- t(grid)
+  grid <- as.character(grid) |>
+    setNames(interaction(1:5, 1:5, sep = "-") |> levels())
+  
+  grid <- create_tile_div(grid, cells = stringr::str_remove(names(palette), "-"))
+  
   # Get legend labels
   b <- bi_class_breaks(data, x = f_ric_bin, y = crb_sm_bin, dim = 5,
                        dig_lab = digits, split = TRUE) |>
     suppressWarnings()
-  
+ 
   b <- sapply(b, \(x) (lead(x) - x)/2 + x) # Get mid points of breaks
   b <- na.omit(b)
   b <- format(b, digits = digits-1)
   
-  x_labs <- create_tile_div(text = b[, "bi_x"], class = "top")
-  y_labs <- create_tile_div(text = rev(b[, "bi_y"]), class = "side")
+  x_labs <- create_tile_div(text = b[, "bi_x"], class = "leg-bottom-number")
+  y_labs <- create_tile_div(text = rev(b[, "bi_y"]), class = "leg-side-number")
   
-  grid <- cbind(x_labs, grid)
-  grid <- rbind(c(create_tile_div(class = "top side"), y_labs), grid)
+  grid <- c(grid, x_labs, y_labs, create_tile_div(class = "leg-empty"))
   
   # Prepare CSS/HTML
-  style <- paste(
-    "<style>",
-    ".grid-container {",
-    "  display: grid;",
-    "  grid-template-columns: ", paste0(rep("auto", dim + 1), collapse = " "), ";",
-    "  padding: 0;",
-    "}",
-    ".grid-item {",
-    "  display: flex;",
-    "  justify-content: center;",
-    "  align-items: center;",
-    "  font-size: 8pt;",
-    "  text-align: right;",
-    "  padding: 4px;",
-    "  width: 15pt;",
-    "  height: 15pt;",
-    "}",
-    ".side {",
-    "  width: 15pt;",
-    #"  align-items: center;",
-    # "  margin-right: 2px;",
-    #"  margin-top: auto;",
-    #"  padding-right: 0;",
-    "}",
-    ".top {",
-    "  height: 15pt;",
-    #"  text-align: center;",
-    #"  margin-top: 50%;",
-    #"  margin-bottom: 2px;",
-    #"  padding-bottom: 0;",
-    "}",
+  paste(
+    "<style>", 
+    paste0(readLines("styles.css"), collapse = "\n"), 
+    create_styles(dim),
     "</style>",
-    "<div class='grid-container'>",
+    "<div class='leg-grid-container'>",
+    "<div class='leg-grid-item leg-bottom-label leg-bl'>Functional Richness &rarr;</div>",
+    "<div class='leg-grid-item leg-side-label leg-sl'>Carbon &rarr;</div>",
     paste0(grid, collapse = "\n"),
     "</div>",
     sep = "\n")
 }
 
-create_tile_div <- function(colour = NULL, text = NULL, class = NULL) {
+create_tile_div <- function(colour = NULL, text = NULL, class = NULL, cells = NULL) {
   if(!is.null(colour)) colour <- paste0(" style='background-color:", colour, ";'")
-  cls <- "grid-item"
-  if(!is.null(class)) cls <- paste(cls, class)
+  cls <- c("leg-grid-item")
+  
+  # If working with labels or spacers
+  if(!is.null(class)) {
+    cls <- paste(cls, class) 
+    if(class == "leg-bottom-number") cls <- paste(cls, paste0("leg-b", seq_len(length(text))))
+    if(class == "leg-side-number") cls <- paste(cls, paste0("leg-s", seq_len(length(text))))
+    if(class == "leg-empty") cls <- paste(cls, "leg-cell", paste0("leg-X", 1:2))
+  }
+  
+  # If working with coloured tiles
+  if(!is.null(cells)) {
+    cls <- paste(cls, "leg-cell", paste0("leg-c", cells))
+    text <- character(length(cells))
+    text[cells == "11"] <- "<span class='leaflet-tooltip leg-tooltip'>Research &<br>Management (1-5)</span>"
+    text[cells == "51"] <- "<span class='leaflet-tooltip leg-tooltip'><strong>Cold spots (1-1)</strong><br>Restoration</span>"
+    text[cells == "55"] <- "<span class='leaflet-tooltip leg-tooltip leg-tooltip-left'>Research &<br>Management (5-1)</span>"
+    text[cells == "15"] <- "<span class='leaflet-tooltip leg-tooltip leg-tooltip-left'><strong>Hotspots (5-5)</strong><br>Conservation</span>"
+  }
+  
   paste0("  <div class='", cls, "'", colour, ">", text, "</div>")
 }
+
+
+create_styles <- function(dim) {
+  
+  cell <- c() 
+  for(i in seq_len(dim)) cell <- c(cell, paste0("c", i, seq_len(dim)))
+  
+  cells <- character(dim)
+  for(i in seq_len(dim)) {
+    cells[i] <- paste0("    'sl s", i, paste0(" c", i, seq_len(dim), collapse = ""), "'")
+  }
+  cells <- paste0(cells, collapse = "\n")
+  
+  paste(
+    ".leg-grid-container {",
+    "  display: grid;",
+    "  grid-template-areas:",
+    cells, 
+    paste0("    'sl X1 ", paste0(" b", seq_len(dim), collapse = " "), "'"),
+    paste0("    'X2 ", paste0(rep("bl", dim + 1), collapse = "  "), "';"), 
+    "  padding: 0;",
+    "}",
+    paste0(paste0(".leg-", cell, " { grid-area: ", cell, "; }"), collapse = "\n"),
+    paste0(paste0(".leg-s", seq_len(dim), " { grid-area: s", seq_len(dim), "; }"), collapse = "\n"),
+    paste0(paste0(".leg-b", seq_len(dim), " { grid-area: b", seq_len(dim), "; }"), collapse = "\n"),
+    ".leg-X1 { grid-area: X1; }",
+    ".leg-X2 { grid-area: X2; }",
+    ".leg-bl { grid-area: bl; }",
+    ".leg-sl { grid-area: sl; }",
+    
+    sep = "\n")
+}
+
+
+
