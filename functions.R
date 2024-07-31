@@ -44,7 +44,7 @@ leaflet_biplot <- function(d) {
   leaflet(data = d) |>
     addProviderTiles(providers$Esri.WorldImagery, group = "Satelite") |>
     addProviderTiles(providers$CartoDB.Positron, group = "Black and White") |>
-    addProviderTiles(providers$Stadia.StamenTerrain, group = "Terrain") |>
+    addProviderTiles(providers$Esri.WorldTopoMap, group = "Terrain") |>
     
     addPolygons(
       data = filter(d, bi_class %in% c("1-1", "1-5", "5-1", "5-5")),
@@ -100,7 +100,7 @@ leaflet_uniplot <- function(d, var, var_nice, labFormat = labelFormat(),
   leaflet(data = d) |>
     addProviderTiles(providers$Esri.WorldImagery, group = "Satelite") |>
     addProviderTiles(providers$CartoDB.Positron, group = "Black and White") |>
-    addProviderTiles(providers$Stadia.StamenTerrain, group = "Terrain") |>
+    addProviderTiles(providers$Esri.WorldTopoMap, group = "Terrain") |>
     
     addPolygons(
       group = var_nice, popup = ~label_overall,
