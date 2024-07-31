@@ -60,8 +60,8 @@ cities <- map(cities, \(city) {
       label_cnpy_mn = paste0("Canopy Cover: ", round(cnpy_mn, 2)),
       label_hght_mn = paste0("Stand Height: ", round(hght_mn, 2)),
       label_age_mn = paste0("Stand Age: ", round(age_mn, 2)),
-      label_nlsp_mn = paste0("% Needle-leaved species: ", round(nlsp_mn, 2)),
-      label_blsp_mn = paste0("% Broad-leaved species: ", round(blsp_mn, 2))) |>
+      label_nlsp_mn = paste0("% Needle-leaved Trees: ", round(nlsp_mn, 2)),
+      label_blsp_mn = paste0("% Broad-leaved Trees: ", round(blsp_mn, 2))) |>
     mutate(centroid = st_centroid(geometry)) |>
     add_coords(geometry = "centroid")
 })
