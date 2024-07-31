@@ -81,7 +81,8 @@ map1[[1]]
 ![](https://img.shields.io/badge/status-In_review-yellow?logoSize=auto)
 [![](https://img.shields.io/badge/bioRxiv-green?logoSize=auto)](https://www.biorxiv.org/content/10.1101/2024.06.21.600078v1)
 
-**Authors**: [Riikka P. Kinnunen](mailto:rpkinnunen@gmail.com), Carly D. Ziter, Barbara Frei  
+**Authors**: [Riikka P. Kinnunen](mailto:rpkinnunen@gmail.com), Carly D. Ziter, Barbara Frei
+
 
 
 **Abstract**: 
@@ -105,22 +106,25 @@ on the right. You can **hover** over tiles for more information and **pan** and 
 more closely explore particular areas.
 
 **Details:** For a detailed overview of the data and how to use bivariate maps, see the [Details](#details) tab.
+
+:::{style="font-size:8pt;color:grey20"}
+Dashboard created by [Steffi LaZerte](https://steffilazerte.ca) using [Quarto](https://quarto.org); Last compiled `r Sys.Date()`
+:::
 :::
 
 ### Column {width="40%"}
-:::{.card title="Bivarate Example"}
+:::{.card title="Bivariate Example"}
 ```{r}
 map1[["Montréal"]]
 ```
 :::
 
 ### Column {width="40%"}
-:::{.card title="Canopy cover Example"}
+:::{.card title="Canopy Cover Example"}
 ```{r}
 map2_cover[["Montréal"]]
 ```
 :::
-
 
 
 ```{r}
