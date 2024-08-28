@@ -1,0 +1,41 @@
+---
+title: "Tests"
+format: 
+  dashboard:
+    embed-resources: true
+    theme: 
+      - default
+      - styles.scss
+    keep-md: true
+---
+
+This is for quick tests of the leaflet map displays.
+
+```{r}
+#| include: false
+
+library(sf)
+library(leaflet)
+library(leaflet.minicharts)
+library(htmlwidgets)
+library(patchwork)
+library(ggplot2)
+library(ggspatial)
+library(ggiraph)
+library(biscale)
+library(dplyr)
+library(purrr)
+
+#source("prep.R")
+source("functions.R")
+cities <- readr::read_rds("data/cities.rds")
+
+```
+
+
+```{r}
+leaflet_biplot(cities[[1]])
+leaflet_uniplot(cities[[1]], var = "cnpy_mn", var_nice = "Canopy")
+leaflet_uniplot(cities[[1]], var = "cnpy_mn", var_nice = "Canopy", 
+                pal = rev(colorspace::sequential_hcl(20, "terrain2")))
+```

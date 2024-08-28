@@ -1,36 +1,29 @@
+# Setup ---------------------------------------------------------------------
+
 library(dplyr)    # Data manipulation
 library(tidyr)    # Data manipulation
 library(sf)       # Spatial data
-library(leaflet)  # Maps
-library(leaflet.minicharts) # Synchronization among plots
 library(purrr)    # Loops and lists
 library(biscale)  # Bi-scales
 library(classInt) # Binning
 
-source("functions.R")
+source("functions.R") # Functions for cleaning
 
-# Data descriptions in Data/README.md
+set.seed(123)
 
-bin_var <- function(v) {
-  cut(v, breaks = classIntervals(v, n = 5, style = "kmeans")$brks,
-      include.lowest = TRUE, dig.lab = 1)
-}
+# See Data descriptions in data/README.md
 
-add_coords <- function(sf, geometry = "geometry") {
-  bind_cols(sf, st_coordinates(sf[[geometry]]))
-}
-
+# Prepare data for mapping --------------------------------------------------
 # Load and clean data as required
 cities <- st_read("data/bird_diversity_carbon_synergies_and_tradeoffs.shp") |>
   drop_na() |>
   rename(completeness = cmpltns) |>
   filter(completeness > 50, slope < 0.3) |>  # All must have
-  filter(pcname == "Regina" | ratio < 3)# |>  # All except Regina must have
-  #nest(.by = "pcname") # Create nested data frame so we can iterate over cities next
+  filter(pcname == "Regina" | ratio < 3)     # All except Regina must have
 
 cities <- split(cities, cities$pcname)
 
-cities["Winnipeg"]
+cities["Calgary"]
 
 # Prepare mapping data (by city)
 cities <- map(cities, \(city) {
@@ -40,7 +33,7 @@ cities <- map(cities, \(city) {
            crb_sm_bin = bin_var(crb_sm)) |>
     # Add the bi_class to the data
     bi_class(x = f_ric_bin, y = crb_sm_bin, dim = 5) |>
-    suppressWarnings() |>
+    suppressWarnings() |>  # bi_class() always warns when more than 4 dimensions
     # Add colours corresponding to the palette
     mutate(colours = purple_pal[bi_class]) |>
     # Create tooltips
@@ -66,16 +59,26 @@ cities <- map(cities, \(city) {
     add_coords(geometry = "centroid")
 })
 
+# Check 
 cities[[1]]
 select(cities[[1]], f_ric, crb_sm, f_ric_bin, crb_sm_bin, bi_class, colours)
 
-
+# Save the data for use in the Quarto Dashboard
 readr::write_rds(cities, "data/cities.rds")
 
-# Get city info
+# Get city info ----------------------------------------------------------
 # Stats Canada, based on 2021 census and Metropolitan areas
 # - https://www12.statcan.gc.ca/census-recensement/2021/dp-pd/prof/details/download-telecharger.cfm?Lang=E
-city_info <- readr::read_csv("data/98-401-X2021002_eng_CSV/98-401-X2021002_English_CSV_data.csv", guess_max = Inf) |>
+
+# Download if not present
+if(!dir.exists("data_dl")) dir.create("data_dl")
+if(!file.exists("data_dl/98-401-X2021002_English_CSV_data.csv")) {
+  download.file(url = "https://www12.statcan.gc.ca/census-recensement/2021/dp-pd/prof/details/download-telecharger/comp/GetFile.cfm?Lang=E&FILETYPE=CSV&GEONO=002",
+                destfile = "data_dl/98-401-X2021002_eng_CSV.zip")
+  unzip("data_dl/98-401-X2021002_eng_CSV.zip", exdir = "data_dl")
+}
+  
+city_info <- readr::read_csv("data_dl/98-401-X2021002_English_CSV_data.csv", guess_max = Inf) |>
   janitor::clean_names() |>
   mutate(geo_name = if_else(geo_name == "Montr\xe9al", "Montréal", geo_name)) |>
   filter(geo_name %in% names(cities),

@@ -239,4 +239,11 @@ create_styles <- function(dim) {
 }
 
 
+bin_var <- function(v) {
+  cut(v, breaks = classIntervals(v, n = 5, style = "kmeans")$brks,
+      include.lowest = TRUE, dig.lab = 1)
+}
 
+add_coords <- function(sf, geometry = "geometry") {
+  bind_cols(sf, st_coordinates(sf[[geometry]]))
+}

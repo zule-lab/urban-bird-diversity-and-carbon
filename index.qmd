@@ -28,7 +28,7 @@ library(biscale)
 library(dplyr)
 library(purrr)
 
-source("prep.R")
+#source("prep.R") # Only required once, or if the prep script changes
 source("functions.R")
 cities <- readr::read_rds("data/cities.rds")
 
