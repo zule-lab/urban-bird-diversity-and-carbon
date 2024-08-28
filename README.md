@@ -5,7 +5,7 @@
 
 
 
-**Authors**: [Riikka P. Kinnunen](mailto:rpkinnunen@gmail.com), Carly D. Ziter, Barbara Frei
+**Authors**: [Riikka P. Kinnunen](mailto:rpkinnunen@gmail.com), [Carly D. Ziter](https://www.carlyziter.com/), [Barbara Frei](https://www.thebirdsthetrees.com/)
 
 **Abstract**: 
 
@@ -17,11 +17,11 @@ Institution: Concordia University
 rpkinnunen@gmail.com   
 
 
-### Development details
+## Development details
 
 This repository hosts the data and code required to create the Quarto Dashboard hosting the interactive results for this manuscript.
 
-#### Reproducibility
+### Reproducibility
 
 This project uses [renv](https://rstudio.github.io/renv/articles/renv.html) to 
 keep track of the R packages and version of R used in this project. 
@@ -29,7 +29,7 @@ This helps to increase the reproducibility of this project by making it easier t
 ensure that different people running this code have the same packages and, more
 importantly the same package versions.
 
-#### Files
+### Files
 
 The relevant files are: 
 
@@ -54,34 +54,31 @@ The relevant files are:
 - renv/* and renv.lock - Files used by renv to keep track of R package dependencies used in this project
 
 
-#### Rendering this dashboard
+### Rendering this dashboard
 
-1. Restore Packages
+1. **Restore Packages**
 
-If you are working on this project for the first time, run the following code
-to ensure you have the correct packages/version installed:
+    If you are working on this project for the first time, run the following code
+    to ensure you have the correct packages/version installed:
+    
+    ```
+    renv::restore()
+    ```
 
-```
-renv::restore()
-```
+2. **Prepare data **
 
-2. Prepare data 
+    Run prep.R to prepare/update the city data (alternatively, skip this step and use
+    the previously prepared data/cities.rds file)
 
-Run prep.R to prepare/update the city data (alternatively, skip this step and use
-the previously prepared data/cities.rds file)
+3. **Render Dashboard**
 
-3. Render Dashboard
+    Render the index.qmd file by either using the quarto package in R: `quarto::quarto_render("index.qmd")`
+    or in the terminal: `quarto render index.qmd`
 
-Render the index.qmd file by either using the quarto package in R: `quarto::quarto_render("index.qmd")`
-or in the terminal: `quarto render index.qmd`
+4. **Serve the Dashboard**
 
-4. Serve the Dashboard
+    If on GitHub, ensure that Github pages are set to Build from the main branch: 
+    Settings > Pages > Build and deployment
 
-If on GitHub, ensure that Github pages are set to Build from the main branch: 
-Settings > Pages > Build and deployment
-
-If on a non-GitHub website, rename and move the index.html file to your website folder. 
-It should appear as https://yourdomain.ca/newname.html.
-
-
-
+    If on a non-GitHub website, rename and move the index.html file to your website folder. 
+    It should appear as https://yourdomain.ca/newname.html.
