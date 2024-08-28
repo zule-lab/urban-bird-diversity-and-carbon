@@ -10,8 +10,10 @@ format:
       - icon: file-earmark-text
         href:  https://www.biorxiv.org/content/10.1101/2024.06.21.600078v1
         aria-label: Manuscript
-      - linkedin
-      - twitter
+      - icon: linkedin
+        href: https://www.linkedin.com/in/riikka-kinnunen-547278106/
+      - icon: twitter
+        href: https://x.com/RiikkaPK
       - github
 ---
 
@@ -81,7 +83,7 @@ map1[[1]]
 ![](https://img.shields.io/badge/status-In_review-yellow?logoSize=auto)
 [![](https://img.shields.io/badge/bioRxiv-green?logoSize=auto)](https://www.biorxiv.org/content/10.1101/2024.06.21.600078v1)
 
-**Authors**: [Riikka P. Kinnunen](mailto:rpkinnunen@gmail.com), Carly D. Ziter, Barbara Frei
+**Authors**: [Riikka P. Kinnunen](mailto:rpkinnunen@gmail.com), [Carly D. Ziter](https://www.carlyziter.com/), [Barbara Frei](https://www.thebirdsthetrees.com/)
 
 
 
