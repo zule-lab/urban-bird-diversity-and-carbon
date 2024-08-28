@@ -41,30 +41,42 @@ leaflet_biplot <- function(d) {
   
   d <- mutate(d, across(contains("label_"), \(x) map(x, htmltools::HTML)))
 
-  leaflet(data = d) |>
+  m <- leaflet(data = d) |>
     addProviderTiles(providers$Esri.WorldImagery, group = "Satelite") |>
-    addProviderTiles(providers$CartoDB.Positron, group = "Black and White") |>
-    addProviderTiles(providers$Esri.WorldTopoMap, group = "Terrain") |>
-    
-    addPolygons(
-      data = filter(d, bi_class %in% c("1-1", "1-5", "5-1", "5-5")),
-      group = "Priority spots", popup = ~label_bi,
-      fillColor = ~colours, opacity = 0, fillOpacity = 0.75,
-      stroke = FALSE,
-      highlightOptions = highlightOptions(fillColor = "orange",
-                                          fillOpacity = 1,
-                                          bringToFront = TRUE),
-      label = ~label_bi) |>
-    
-    addPolygons(
-      data = filter(d, !bi_class %in% c("1-1", "1-5", "5-1", "5-5")),
-      group = "Intermediate spots", popup = ~label_bi,
-      fillColor = ~colours, opacity = 0, fillOpacity = 0.75,
-      stroke = FALSE,
-      highlightOptions = highlightOptions(fillColor = "orange",
-                                          fillOpacity = 1,
-                                          bringToFront = TRUE),
-      label = ~label_bi) |>
+    addProviderTiles(providers$Esri.WorldTopoMap, group = "Terrain")
+  
+  dd <- filter(d, bi_class == "5-5")
+  if(nrow(dd) > 0) {
+    m <- addPolygonsCustom(
+      map = m, data = dd,
+      group = "Hotspots", popup = ~label_bi, fillColor = ~colours,
+      label = ~label_bi)
+  }
+  dd <- filter(d, bi_class ==  "1-1")
+  if(nrow(dd) > 0) {
+    m <- addPolygonsCustom(
+      map = m, data = dd,
+      group = "Coldspots", popup = ~label_bi, fillColor = ~colours, 
+      label = ~label_bi)
+  }
+  
+  dd <- filter(d, bi_class %in% c("1-5", "5-1"))
+  if(nrow(dd) > 0) {
+    m <- addPolygonsCustom(
+      map = m, data = dd, 
+      group = "Trade-offs", popup = ~label_bi, fillColor = ~colours,
+      label = ~label_bi)
+  }
+  
+  dd <- filter(d, !bi_class %in% c("1-1", "1-5", "5-1", "5-5"))
+  if(nrow(dd) > 0) {
+    m <- addPolygonsCustom(
+      map = m, data = dd,
+      group = "Other", popup = ~label_bi, fillColor = ~colours,
+      label = ~label_bi)
+  }
+  
+  m |> 
     addControl(
       position = "bottomright",
       html = p) |>
@@ -75,9 +87,10 @@ leaflet_biplot <- function(d) {
                  "<strong>Area (km²):</strong> ", format(info$area, big.mark = ","),  "<br>",
                  "<span style='font-size:8pt'>Stats Canada 2021 Census for metropolitan areas</span>")) |>
     addLayersControl(
-      baseGroups = c("Terrain", "Satelite", "Black and White"),
-      overlayGroups = c("Intermediate spots", "Priority spots"),
-      options = layersControlOptions(collapsed = FALSE))
+      baseGroups = c("Terrain", "Satelite"),
+      overlayGroups = c("Hotspots", "Coldspots", "Trade-offs", "Other"),
+      options = layersControlOptions(collapsed = TRUE)) |>
+    addScaleBar(position = "topleft")
 }
 
 leaflet_uniplot <- function(d, var, var_nice, labFormat = labelFormat(),
@@ -99,25 +112,34 @@ leaflet_uniplot <- function(d, var, var_nice, labFormat = labelFormat(),
 
   leaflet(data = d) |>
     addProviderTiles(providers$Esri.WorldImagery, group = "Satelite") |>
-    addProviderTiles(providers$CartoDB.Positron, group = "Black and White") |>
     addProviderTiles(providers$Esri.WorldTopoMap, group = "Terrain") |>
     
-    addPolygons(
+    addPolygonsCustom(
       group = var_nice, popup = ~label_overall,
-      fillColor = ~pal(var), opacity = 0, fillOpacity = 0.75,
-      color = "white", stroke = FALSE,
-      highlightOptions = highlightOptions(fillColor = "orange",
-                                          fillOpacity = 1,
-                                          bringToFront = TRUE),
+      fillColor = ~pal(var),
       label = ~label_overall) |>
     addLegend("bottomright", pal = pal, values = ~var, bins = 5,
               title = paste0("<div class='leg-title'>", var_nice, "</div>"), 
               opacity = 1, group = var_nice,
               labFormat = labFormat) |>
     addLayersControl(
-      baseGroups = c("Terrain", "Satelite", "Black and White"),
-      options = layersControlOptions(collapsed = FALSE))
+      baseGroups = c("Terrain", "Satelite"),
+      options = layersControlOptions(collapsed = TRUE)) |>
+    addScaleBar(position = "topleft")
 }
+
+
+addPolygonsCustom <- function(map, ...) {
+
+  addPolygons(map,
+              fillOpacity = 0.75,
+              stroke = TRUE, color = "black", opacity = 1, weight = 0.75,
+              highlightOptions = highlightOptions(fillColor = "orange",
+                                                  fillOpacity = 1,
+                                                  bringToFront = TRUE),
+              ...)
+}
+
                    
 create_grid_legend <- function(data, palette, dim = 5, digits = 2) {
   # Prepare colour tiles
@@ -176,7 +198,7 @@ create_tile_div <- function(colour = NULL, text = NULL, class = NULL, cells = NU
     cls <- paste(cls, "leg-cell", paste0("leg-c", cells))
     text <- character(length(cells))
     text[cells == "11"] <- "<span class='leaflet-tooltip leg-tooltip'>Research &<br>Management (1-5)</span>"
-    text[cells == "51"] <- "<span class='leaflet-tooltip leg-tooltip'><strong>Cold spots (1-1)</strong><br>Restoration</span>"
+    text[cells == "51"] <- "<span class='leaflet-tooltip leg-tooltip'><strong>Coldspots (1-1)</strong><br>Restoration</span>"
     text[cells == "55"] <- "<span class='leaflet-tooltip leg-tooltip leg-tooltip-left'>Research &<br>Management (5-1)</span>"
     text[cells == "15"] <- "<span class='leaflet-tooltip leg-tooltip leg-tooltip-left'><strong>Hotspots (5-5)</strong><br>Conservation</span>"
   }

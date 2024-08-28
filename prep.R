@@ -47,7 +47,7 @@ cities <- map(cities, \(city) {
     mutate(
       highlight = case_match(
         bi_class,
-        "1-1" ~ "<strong>Cold spot:</strong> Target restoration<br>",
+        "1-1" ~ "<strong>Coldspot:</strong> Target restoration<br>",
         "5-5" ~ "<strong>Hotspot:</strong> Target conservation<br>",
         "1-5" ~ "<strong>High Carbon:</strong> Target research & management<br>",
         "5-1" ~ "<strong>High Richness:</strong> Target research & management<br>",

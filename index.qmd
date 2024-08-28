@@ -193,11 +193,11 @@ Each variable is binned into 5 different categories (1, 2, 3, 4, and 5). Then ea
 assigned a combined score, for example, a site with a 1-1 score indicates that it 
 has low carbon storage as well as low species richness.
 
-This in turn results in identifying hotspots, cold spots, and areas high in one of
+This in turn results in identifying hotspots, coldspots, and areas high in one of
 the two variables.
 
 - **Hotspots** - Areas important for conservation
-- **Cold spots** - Areas important for restoration
+- **Coldspots** - Areas important for restoration
 - **Trade-off Areas** - Areas which need more research and are important for management to keep biodiversity or carbon storage high
 
 :::{style="width:70%; margin: 0 auto;"}
