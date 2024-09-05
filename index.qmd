@@ -1,8 +1,8 @@
 ---
-title: "Interactive Results"
+title: "Interactive Maps of Urban Bird Diversity and Carbon Storage"
 format: 
   dashboard:
-    embed-resources: true
+    embed-resources: false
     theme: 
       - Spacelab
       - custom.scss
