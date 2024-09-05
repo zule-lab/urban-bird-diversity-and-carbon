@@ -8,3 +8,7 @@ $nav-link-color: #000;
 .card-header {
   background-color: #9ab3a4 /*#759482;*/
 }
+
+.leaflet-left .info.leaflet-control.legend {
+  margin-bottom: 40px; /* Avoid overlap with the attribution bar */
+}

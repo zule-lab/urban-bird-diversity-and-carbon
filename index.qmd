@@ -230,21 +230,24 @@ the two variables.
 
 Modified data used for data analyses. Data was compiled from multiple sources:
 
-eBird data: eBird Basic Dataset. (2022). <https://ebird.org>
+**eBird**: eBird Basic Dataset. (2022). <https://ebird.org>
 
-Carbon data: Sothe, C., Gonsamu, A., Snider, J., Arabian, J., Kurz, W. A., & Finkelstein, S. (2021). Carbon map and uncertainty in forested areas of Canada, 250m spatial resolution (Version 1) [Data set]. 4TU.ResearchData. <https://doi.org/10.4121/14572929.V1>
+**Carbon**: Sothe, C., Gonsamu, A., Snider, J., Arabian, J., Kurz, W. A., & Finkelstein, S. (2021). Carbon map and uncertainty in forested areas of Canada, 250m spatial resolution (Version 1) [Data set]. 4TU.ResearchData. <https://doi.org/10.4121/14572929.V1>
 
-Vegetation attributes data: Beaudoin, A., Bernier, P. Y., Villemaire, P., Guindon, L., & Guo, X. J. (2018). Tracking forest attributes across Canada between 2001 and 2011 using a k nearest neighbors mapping approach applied to MODIS imagery. Canadian Journal of Forest Research, 48(1), 85-93. <https://open.canada.ca/data/en/dataset/ec9e2659-1c29-4ddb-87a2-6aced147a990>
+**Vegetation attributes**: Beaudoin, A., Bernier, P. Y., Villemaire, P., Guindon, L., & Guo, X. J. (2018). Tracking forest attributes across Canada between 2001 and 2011 using a k nearest neighbors mapping approach applied to MODIS imagery. Canadian Journal of Forest Research, 48(1), 85-93. <https://open.canada.ca/data/en/dataset/ec9e2659-1c29-4ddb-87a2-6aced147a990>
 
-Bird life-history data for functional diversity analyses:
+**Bird life-history data for functional diversity analyses**:  
+
 Myhrvold, P. N., Baldridge, E., Chan, B., Sivam, D., L. Freeman, D., & Ernest, S. K. M. (2016). An amniote life-history database to perform comparative analyses with birds, mammals, and reptiles (Version 1). Wiley. <https://doi.org/10.6084/m9.figshare.c.3308127.v1> 
 
 Tobias, J. A., Sheard, C., Pigot, A. L., Devenish, A. J., Yang, J., Sayol, F., ... & Schleuning, M. (2022). AVONET: morphological, ecological and geographical data for all birds. Ecology Letters, 25(3), 581-597.
 The AVONET dataset and all code for figures and analyses in this manuscript are archived on Figshare <https://figshare.com/s/b990722d72a26b5bfead>
 
-Urban area boundary:
+**Urban area boundary**: 
 Statistics Canada. Population Centre boundary files. <https://www12.statcan.gc.ca/census-recensement/2021/geo/sip-pis/boundary-limites/index2021-eng.cfm?year=21>
 
+**Urban population statistics**: 
+Statistics Canada. 2022. Census Profile. 2021 Census. Statistics Canada Catalogue no. 98-316-X2021001. Ottawa. Released December 15, 2022. <https://www12.statcan.gc.ca/census-recensement/2021/dp-pd/prof/index.cfm?Lang=E>
 :::
 
 
