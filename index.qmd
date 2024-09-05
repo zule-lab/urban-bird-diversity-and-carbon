@@ -212,8 +212,12 @@ the two variables.
 
 :::{.card title="Measurements"}
 
+**Filtered Measurements**: Sites which had poor eBird sampling and thus unreliable species richness were omitted from the Carbon x Richness bivariate analyses. Other measurements for these sites can be viewed by showing the "Excluded from bivariate" layer or omitted by showing only the "Included in bivariate" layer. 
+
+**Variable descriptions**:  
+
 - **Carbon**: Total Carbon. Total above-ground forest carbon (kg C/m²) in each grid. Modified from a recently published high-resolution map of Canada's terrestrial carbon stocks (Sothe et al., 2022). 
-- **Richness**: Bird functional richness. Calculated using R package FD. 
+- **Richness**: Bird functional richness. Calculated from eBird data using R package FD. 
 - **Canopy Cover**: Mean canopy cover. Mean of the percent crown closure values in each grid.
 - **Stand Age**: Mean tree stand age. Mean tree stand age (mean age of the leading species of polygons in years) in each grid.
 - **Stand Height**: Mean tree stand height. Mean tree stand height (mean height of the leading species of polygons in meters) in each grid.

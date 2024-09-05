@@ -37,9 +37,11 @@ leaflet_biplot <- function(d) {
     filter(pcname == d$pcname[1])
   
   p <- create_grid_legend(d, purple_pal)
-  d$colours <- unname(d$colours)
-  
-  d <- mutate(d, across(contains("label_"), \(x) map(x, htmltools::HTML)))
+ 
+  d <- d |>
+    filter(good_effort == TRUE) |>
+    mutate(bi_colours = unname(bi_colours)) |>
+    mutate(across(contains("label_"), \(x) map(x, htmltools::HTML)))
 
   m <- leaflet(data = d) |>
     addProviderTiles(providers$Esri.WorldImagery, group = "Satelite") |>
@@ -49,14 +51,14 @@ leaflet_biplot <- function(d) {
   if(nrow(dd) > 0) {
     m <- addPolygonsCustom(
       map = m, data = dd,
-      group = "Hotspots", popup = ~label_bi, fillColor = ~colours,
+      group = "Hotspots", popup = ~label_bi, fillColor = ~bi_colours,
       label = ~label_bi)
   }
   dd <- filter(d, bi_class ==  "1-1")
   if(nrow(dd) > 0) {
     m <- addPolygonsCustom(
       map = m, data = dd,
-      group = "Coldspots", popup = ~label_bi, fillColor = ~colours, 
+      group = "Coldspots", popup = ~label_bi, fillColor = ~bi_colours, 
       label = ~label_bi)
   }
   
@@ -64,7 +66,7 @@ leaflet_biplot <- function(d) {
   if(nrow(dd) > 0) {
     m <- addPolygonsCustom(
       map = m, data = dd, 
-      group = "Trade-offs", popup = ~label_bi, fillColor = ~colours,
+      group = "Trade-offs", popup = ~label_bi, fillColor = ~bi_colours,
       label = ~label_bi)
   }
   
@@ -72,7 +74,7 @@ leaflet_biplot <- function(d) {
   if(nrow(dd) > 0) {
     m <- addPolygonsCustom(
       map = m, data = dd,
-      group = "Other", popup = ~label_bi, fillColor = ~colours,
+      group = "Other", popup = ~label_bi, fillColor = ~bi_colours,
       label = ~label_bi)
   }
   
@@ -93,37 +95,63 @@ leaflet_biplot <- function(d) {
     addScaleBar(position = "topleft")
 }
 
-leaflet_uniplot <- function(d, var, var_nice, labFormat = labelFormat(),
-                            pal = "plasma") {
+leaflet_uniplot <- function(
+    d, var, var_nice, labFormat = labelFormat(),
+    pal = "plasma", # pal = colorspace::sequential_hcl(20, "terrain2")
+    filter_labels = c("Excluded from bivariate", "Included in bivariate")) {
+  # filter_labels = c("Adequate eBird sampling", "Poor eBird sampling")
+  
   #https://rstudio.github.io/leaflet/articles/morefeatures.html
 
-  #pal <- colorNumeric(colorspace::sequential_hcl(20, "terrain2"), domain = d[[var]])
-  pal <- colorNumeric(pal, domain = d[[var]])
-  
   d$var <- d[[var]]
   d[[paste0("label_", var)]] <- paste0("<strong>", d[[paste0("label_", var)]], "</strong>")
 
   d <- d |>
+    relocate(label_bi, label_cnpy_mn, label_hght_mn, label_age_mn, label_nlsp_mn, label_blsp_mn,
+             .after = "uniq_id") |>
     rowwise() |>
     mutate(label_overall = paste0(c_across(contains("label_")), collapse = "<br>")) |>
     ungroup() |>
-    mutate(across(contains("label_"), \(x) map(x, htmltools::HTML)))
+    mutate(across(contains("label_"), \(x) map(x, htmltools::HTML))) |>
+    filter(!(is.na(f_ric) & is.na(cnpy_mn) & is.na(hght_mn) & 
+               is.na(age_mn) & is.na(nlsp_mn) & is.na(blsp_mn)))
   
-
-  leaflet(data = d) |>
+  
+  pal <- colorNumeric(pal, domain = d[[var]])
+  
+  # Base map
+  m <- leaflet(data = d) |>
     addProviderTiles(providers$Esri.WorldImagery, group = "Satelite") |>
-    addProviderTiles(providers$Esri.WorldTopoMap, group = "Terrain") |>
-    
-    addPolygonsCustom(
-      group = var_nice, popup = ~label_overall,
+    addProviderTiles(providers$Esri.WorldTopoMap, group = "Terrain")
+  
+  # Add different layers by filtered status
+  dd <- filter(d, good_effort == FALSE)
+  if(nrow(dd) > 0) {
+    m <- addPolygonsCustom(
+      map = m, data = dd,
+      group = filter_labels[1], 
+      popup = ~label_overall,
       fillColor = ~pal(var),
-      label = ~label_overall) |>
+      label = ~label_overall)
+  }
+  dd <- filter(d, good_effort == TRUE)
+  if(nrow(dd) > 0) {
+    m <- addPolygonsCustom(
+      map = m, data = dd,
+      group = filter_labels[2], 
+      popup = ~label_overall,
+      fillColor = ~pal(var),
+      label = ~label_overall)
+  }
+  
+  m |>
     addLegend("bottomright", pal = pal, values = ~var, bins = 5,
               title = paste0("<div class='leg-title'>", var_nice, "</div>"), 
               opacity = 1, group = var_nice,
               labFormat = labFormat) |>
     addLayersControl(
       baseGroups = c("Terrain", "Satelite"),
+      overlayGroups = filter_labels,
       options = layersControlOptions(collapsed = TRUE)) |>
     addScaleBar(position = "topleft")
 }

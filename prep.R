@@ -16,27 +16,42 @@ set.seed(123)
 # Prepare data for mapping --------------------------------------------------
 # Load and clean data as required
 cities <- st_read("data/bird_diversity_carbon_synergies_and_tradeoffs.shp") |>
-  drop_na() |>
-  rename(completeness = cmpltns) |>
-  filter(completeness > 50, slope < 0.3) |>  # All must have
-  filter(pcname == "Regina" | ratio < 3)     # All except Regina must have
+  select(pcname, uniq_id, completeness = cmpltns, slope, ratio,  # Quality and metadata
+         f_ric, crb_sm,                                 # Bivariate variables
+         cnpy_mn, hght_mn, age_mn, nlsp_mn, blsp_mn)    # Extra variables
 
 cities <- split(cities, cities$pcname)
 
-cities["Calgary"]
-
 # Prepare mapping data (by city)
 cities <- map(cities, \(city) {
-  city |>
+  city_bi <- city |>
+    drop_na() |>
+    filter(completeness > 50, slope < 0.3) |>  # All must have
+    filter(pcname == "Regina" | ratio < 3) |>  # All except Regina must have
     # Bin the Data
-    mutate(f_ric_bin = bin_var(f_ric),
+    mutate(good_effort = TRUE,
+           f_ric_bin = bin_var(f_ric),
            crb_sm_bin = bin_var(crb_sm)) |>
     # Add the bi_class to the data
     bi_class(x = f_ric_bin, y = crb_sm_bin, dim = 5) |>
     suppressWarnings() |>  # bi_class() always warns when more than 4 dimensions
     # Add colours corresponding to the palette
-    mutate(colours = purple_pal[bi_class]) |>
+    mutate(bi_colours = purple_pal[bi_class]) |>
     # Create tooltips
+    
+    select(pcname, uniq_id, f_ric_bin, crb_sm_bin, bi_colours, bi_class, good_effort)
+  
+  # Combine bi_class only with all data
+  city |>
+    mutate(
+      label_cnpy_mn = paste0("Canopy Cover: ", round(cnpy_mn, 2)),
+      label_hght_mn = paste0("Stand Height: ", round(hght_mn, 2)),
+      label_age_mn = paste0("Stand Age: ", round(age_mn, 2)),
+      label_nlsp_mn = paste0("% Needle-leaved Trees: ", round(nlsp_mn, 2)),
+      label_blsp_mn = paste0("% Broad-leaved Trees: ", round(blsp_mn, 2))) |>
+    select(pcname, uniq_id, cnpy_mn, hght_mn, age_mn, nlsp_mn, blsp_mn,
+           crb_sm, f_ric, starts_with("label_")) |>
+    left_join(st_drop_geometry(city_bi), by = c("pcname", "uniq_id")) |>
     mutate(
       highlight = case_match(
         bi_class,
@@ -49,19 +64,12 @@ cities <- map(cities, \(city) {
         highlight,
         "Bivarate Category: ", bi_class, "<br>",
         "Carbon: ", round(crb_sm, 3), "<br>",
-        "Richness: ", round(f_ric, 3)),
-      label_cnpy_mn = paste0("Canopy Cover: ", round(cnpy_mn, 2)),
-      label_hght_mn = paste0("Stand Height: ", round(hght_mn, 2)),
-      label_age_mn = paste0("Stand Age: ", round(age_mn, 2)),
-      label_nlsp_mn = paste0("% Needle-leaved Trees: ", round(nlsp_mn, 2)),
-      label_blsp_mn = paste0("% Broad-leaved Trees: ", round(blsp_mn, 2))) |>
-    mutate(centroid = st_centroid(geometry)) |>
-    add_coords(geometry = "centroid")
+        "Richness: ", round(f_ric, 3))) |>
+    mutate(good_effort = replace_na(good_effort, FALSE))
 })
 
 # Check 
 cities[[1]]
-select(cities[[1]], f_ric, crb_sm, f_ric_bin, crb_sm_bin, bi_class, colours)
 
 # Save the data for use in the Quarto Dashboard
 readr::write_rds(cities, "data/cities.rds")
