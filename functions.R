@@ -98,7 +98,7 @@ leaflet_biplot <- function(d) {
 leaflet_uniplot <- function(
     d, var, var_nice, labFormat = labelFormat(),
     pal = "plasma", # pal = colorspace::sequential_hcl(20, "terrain2")
-    filter_labels = c("Excluded from bivariate", "Included in bivariate")) {
+    filter_labels = c("Excluded from Bivariate", "Included in Bivariate")) {
   # filter_labels = c("Adequate eBird sampling", "Poor eBird sampling")
   
   #https://rstudio.github.io/leaflet/articles/morefeatures.html
