@@ -1,7 +1,7 @@
 # Multi-city analysis of synergies and trade-offs between urban bird diversity and carbon storage to inform decision-making 
 
 
-This README.txt file was generated on 2024-06-20 by Riikka P Kinnunen
+This README.txt file was generated on 2024-10-21 by Riikka P Kinnunen
 
 Data from Kinnunen et al. "Multi-city analysis of synergies and trade-offs between urban bird diversity and carbon storage to inform decision-making".
 
@@ -17,7 +17,7 @@ Principal Investigator Contact Information
 	Email: rpkinnunen@gmail.com
 ```
 
-File: bird_diversity_carbon_synergies_and_tradeoffs. csv
+File: bird_diversity_carbon_synergies_and_tradeoffs_2. csv and accompanying shapefile
 
 Modified data used for data analyses. Data was compiled from multiple sources:
 
@@ -46,8 +46,6 @@ uniq_id: ID of grid
 
 pcname: Name of population centre. Corresponds to the name in Statistics Canada Census data and Population Centre Boundary File shapefiles.
 
-city: City name. 
-
 slope: Accumulation curve slope obtained using R package KnowBR to assess survey completeness of eBird species inventories across cities.
 
 completeness: Completeness percentage (the percentage representing the observed number
@@ -57,7 +55,7 @@ ratio: Ratio between the number of eBird records and the observed bird species o
 
 tl_ckl: The number of eBird checklists per grid. Calculated using R Statistical Software.
 
-pred_rich: Predicted bird species richness for each grid obtained from KnowBR.
+prd_rch: Predicted bird species richness for each grid obtained from KnowBR.
 
 sp_rich: Bird species richness for each grid. Calculated using R Statistical Software.
 
@@ -67,15 +65,11 @@ sp_div: Bird species diversity. Shannon diversity index (for each grid) calculat
 
 f_ric: Bird functional richness. Calculated using R package FD. 
 
+ql_f_ri: Quality of functional richness.  Calculated using R package FD.
+
 f_eve: Bird functional evenness. Calculated using R package FD. 
 
 f_div: Bird functional divergence. Calculated using R package FD.
-
-treed_mn: Mean vegetated treed area. Mean of all the percentage of vegetated treed area (the proportion from vegetated area that is tree cover) values in each grid. 
-
-treed_sd: Standard deviation of vegetated treed area. SD of all the vegetated treed area(the proportion from vegetated area that is tree cover) values in each grid. 
-
-treed_md: Mode of vegetated treed area. Most common vegetated treed area value (the proportion from vegetated area that is tree cover) in each grid. 
 
 canopy_mn: Mean canopy cover. Mean of the percent crown closure values in each grid.
 
@@ -107,13 +101,17 @@ blsp_sd: Standard deviation of broad-leaved tree species. SD of the percent comp
 
 blsp_md: Mode of broad-leaved tree species. Most common percent composition value of all broad-leaved tree species. 
 
-crb_sm: Total Carbon. Total above-ground forest carbon (kg C/m²) in each grid. Modified from a recently published high-resolution map of Canada's terrestrial carbon stocks (Sothe et al., 2022). 
-
-total_bl_nl_sp: Total percent composition of all broad-leaved and needle-leaved tree species (total trees = total broad-leaved + total needle-leaved species) 
+total_trees: Total percent composition of all broad-leaved and needle-leaved tree species (total trees = total broad-leaved + total needle-leaved species) 
 
 prop_blsp: Proportion of broad-leaved species. The proportion of broad-leaved tree species in each grid.
 
-prop_nlsp: Proportion of needle-leaved species. The proportion of needle-leaved tree species in each grid. 
+prop_nlsp: Proportion of needle-leaved species. The proportion of needle-leaved tree species in each grid.
+
+crb_mn: Mean carbon. Mean above-ground forest carbon (kg C/m²) in each grid. Modified from a recently published high-resolution map of Canada's terrestrial carbon stocks (Sothe et al., 2022). 
+
+crb_sm: Total carbon. Total above-ground forest carbon (kg C/m²) in each grid. Modified from a recently published high-resolution map of Canada's terrestrial carbon stocks (Sothe et al., 2022). 
+
+
 
 
 

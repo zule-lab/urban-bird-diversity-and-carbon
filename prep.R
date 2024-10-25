@@ -15,7 +15,7 @@ set.seed(123)
 
 # Prepare data for mapping --------------------------------------------------
 # Load and clean data as required
-cities <- st_read("data/bird_diversity_carbon_synergies_and_tradeoffs.shp") |>
+cities <- st_read("data/bird_diversity_carbon_synergies_and_tradeoffs_2.shp") |>
   select(pcname, uniq_id, completeness = cmpltns, slope, ratio,  # Quality and metadata
          f_ric, crb_sm,                                 # Bivariate variables
          cnpy_mn, hght_mn, age_mn, nlsp_mn, blsp_mn)    # Extra variables

@@ -72,8 +72,8 @@ The relevant files are:
 
 3. **Render Dashboard**
 
-    Render the index.qmd file by either using the quarto package in R: `quarto::quarto_render("index.qmd")`
-    or in the terminal: `quarto render index.qmd`
+    Render the index.qmd file by using the quarto program in the terminal: 
+    `quarto render index.qmd`
 
 4. **Serve the Dashboard**
 
